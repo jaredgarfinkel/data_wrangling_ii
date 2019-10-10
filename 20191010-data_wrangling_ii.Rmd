@@ -1,0 +1,14 @@
+---
+title: "20191010-data_wrangling_ii"
+author: "Jared Garfinkel"
+date: "10/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(rvest)
+library(httr)
+```
