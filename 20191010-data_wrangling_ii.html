@@ -370,7 +370,102 @@ summary {
 </div>
 
 
+<p>read in the NSDOH data</p>
+<pre class="r"><code>url = &quot;http://samhda.s3-us-gov-west-1.amazonaws.com/s3fs-public/field-uploads/2k15StateFiles/NSDUHsaeShortTermCHG2015.htm&quot;
 
+drug_use_xml = 
+  read_html(url)
+table_mj &lt;- 
+  drug_use_xml %&gt;%  
+  html_nodes(css = &quot;table&quot;) %&gt;% 
+  .[[1]] %&gt;% 
+  html_table() %&gt;% 
+  slice(-1) %&gt;% 
+  as_tibble()</code></pre>
+<pre class="r"><code>nyc_cost = 
+  read_html(&quot;https://www.bestplaces.net/cost_of_living/city/new_york/new_york&quot;) %&gt;%
+  html_nodes(css = &quot;table&quot;) %&gt;%
+  .[[1]] %&gt;%
+  html_table(header = TRUE)</code></pre>
+<div id="get-harry-potter-data" class="section level2">
+<h2>Get Harry Potter data</h2>
+<pre class="r"><code>hpsaga_html =
+  read_html(&quot;https://www.imdb.com/list/ls000630791/&quot;)
+title_vec = 
+  hpsaga_html %&gt;%
+  html_nodes(&quot;.lister-item-header a&quot;) %&gt;%
+  html_text()
+runtime_vec = 
+  hpsaga_html %&gt;%
+  html_nodes(&quot;.runtime&quot;) %&gt;%
+  html_text()
+gross_rev_vec = 
+  hpsaga_html %&gt;%
+  html_nodes(&quot;.text-muted .ghost~ .text-muted+ span&quot;) %&gt;%
+  html_text()
+hpsaga_df = 
+  tibble(
+    title = title_vec,
+    money = gross_rev_vec,
+    runtime = runtime_vec)</code></pre>
+<p>Amazon review for Napoleon Dynamite</p>
+<pre class="r"><code>url = &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=1&quot;
+
+dynamite_html = read_html(url)
+
+review_titles = 
+  dynamite_html %&gt;%
+  html_nodes(&quot;.a-text-bold span&quot;) %&gt;%
+  html_text()
+
+ review_stars = 
+  dynamite_html %&gt;%
+  html_nodes(&quot;#cm_cr-review_list .review-rating&quot;) %&gt;%
+  html_text()
+
+review_text = 
+  dynamite_html %&gt;%
+  html_nodes(&quot;.review-text-content span&quot;) %&gt;%
+  html_text()
+
+reviews = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)</code></pre>
+<pre class="r"><code>nyc_water = 
+  GET(&quot;https://data.cityofnewyork.us/resource/ia2d-e54m.csv&quot;) %&gt;% 
+  content()</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   year = col_double(),
+##   new_york_city_population = col_double(),
+##   nyc_consumption_million_gallons_per_day = col_double(),
+##   per_capita_gallons_per_person_per_day = col_double()
+## )</code></pre>
+<pre class="r"><code>nyc_water = 
+  GET(&quot;https://data.cityofnewyork.us/resource/waf7-5gvc.json&quot;) %&gt;% 
+  content(&quot;text&quot;) %&gt;%
+  jsonlite::fromJSON() %&gt;%
+  as_tibble()</code></pre>
+<pre class="r"><code>brfss_smart2010 = 
+  GET(&quot;https://data.cdc.gov/api/views/acme-vg9e/rows.csv?accessType=DOWNLOAD&quot;) %&gt;% 
+  content(&quot;parsed&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_character(),
+##   Year = col_double(),
+##   Sample_Size = col_double(),
+##   Data_value = col_double(),
+##   Confidence_limit_Low = col_double(),
+##   Confidence_limit_High = col_double(),
+##   Display_order = col_double(),
+##   LocationID = col_logical()
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>poke = GET(&quot;https://pokeapi.co/api/v2/pokemon/1&quot;) %&gt;% 
+  content()</code></pre>
+</div>
 
 
 

@@ -12,3 +12,106 @@ library(tidyverse)
 library(rvest)
 library(httr)
 ```
+
+read in the NSDOH data
+
+```{r}
+url = "http://samhda.s3-us-gov-west-1.amazonaws.com/s3fs-public/field-uploads/2k15StateFiles/NSDUHsaeShortTermCHG2015.htm"
+
+drug_use_xml = 
+  read_html(url)
+table_mj <- 
+  drug_use_xml %>%  
+  html_nodes(css = "table") %>% 
+  .[[1]] %>% 
+  html_table() %>% 
+  slice(-1) %>% 
+  as_tibble()
+```
+
+```{r, eval = FALSE}
+nyc_cost = 
+  read_html("https://www.bestplaces.net/cost_of_living/city/new_york/new_york") %>%
+  html_nodes(css = "table") %>%
+  .[[1]] %>%
+  html_table(header = TRUE)
+```
+
+## Get Harry Potter data
+
+```{r}
+hpsaga_html =
+  read_html("https://www.imdb.com/list/ls000630791/")
+title_vec = 
+  hpsaga_html %>%
+  html_nodes(".lister-item-header a") %>%
+  html_text()
+runtime_vec = 
+  hpsaga_html %>%
+  html_nodes(".runtime") %>%
+  html_text()
+gross_rev_vec = 
+  hpsaga_html %>%
+  html_nodes(".text-muted .ghost~ .text-muted+ span") %>%
+  html_text()
+hpsaga_df = 
+  tibble(
+    title = title_vec,
+    money = gross_rev_vec,
+    runtime = runtime_vec)
+```
+
+Amazon review for Napoleon Dynamite
+
+```{r}
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=1"
+
+dynamite_html = read_html(url)
+
+review_titles = 
+  dynamite_html %>%
+  html_nodes(".a-text-bold span") %>%
+  html_text()
+
+ review_stars = 
+  dynamite_html %>%
+  html_nodes("#cm_cr-review_list .review-rating") %>%
+  html_text()
+
+review_text = 
+  dynamite_html %>%
+  html_nodes(".review-text-content span") %>%
+  html_text()
+
+reviews = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
+```
+
+```{r}
+nyc_water = 
+  GET("https://data.cityofnewyork.us/resource/ia2d-e54m.csv") %>% 
+  content()
+```
+
+```{r}
+nyc_water = 
+  GET("https://data.cityofnewyork.us/resource/waf7-5gvc.json") %>% 
+  content("text") %>%
+  jsonlite::fromJSON() %>%
+  as_tibble()
+```
+
+```{r}
+brfss_smart2010 = 
+  GET("https://data.cdc.gov/api/views/acme-vg9e/rows.csv?accessType=DOWNLOAD") %>% 
+  content("parsed")
+```
+
+```{r}
+poke = GET("https://pokeapi.co/api/v2/pokemon/1") %>% 
+  content()
+```
+
